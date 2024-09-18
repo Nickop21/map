@@ -3,7 +3,7 @@ import React from "react";
 function Details({ selectedProperty }) {
   return (
     <div className="details">
-      {selectedProperty.status == "active" ? (
+      {selectedProperty.status === "active" ? (
         <span className="avaliablity green">available</span>
       ) : (
         <span className="avaliablity red">unavailable</span>
@@ -29,8 +29,8 @@ function Details({ selectedProperty }) {
 
         <div>
           Price per Acre : ₹
-          {selectedProperty.price_per_acre_crore > 0 && (
-            <span> {selectedProperty.price_per_acre_crore} crore </span>
+          {selectedProperty.price_per_acre_crore.crore > 0 && (
+            <span> {selectedProperty.price_per_acre_crore.crore} crore </span>
           )}
           <span>{selectedProperty.price_per_acre_crore.lakh} lakhs</span>
         </div>

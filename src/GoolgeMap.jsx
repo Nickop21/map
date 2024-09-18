@@ -15,10 +15,10 @@ const containerStyle = {
 function GoolgeMap() {
   const [properties, setProperties] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [center, setCenter] = useState({ lat: 20.5937, lng: 78.9629 }); 
+  const [center, setCenter] = useState({ lat: 20.5937, lng: 78.9629 });
 
   const customIcon = {
-    url: "marker.png", 
+    url: "marker.png",
     scaledSize: { width: 30, height: 30 },
   };
 
@@ -27,7 +27,6 @@ function GoolgeMap() {
     fetch("https://prod-be.1acre.in/lands/landmaps/?seller_id=211")
       .then((response) => response.json())
       .then((data) => {
-
         // Validate and convert lat/long strings to numbers
         const validProperties = data?.map((property) => ({
           ...property,
@@ -36,17 +35,18 @@ function GoolgeMap() {
         }));
         setProperties(validProperties);
 
-        // if (validProperties.length > 0) {
-        //   setCenter({
-        //     lat: validProperties[0].latitude,
-        //     lng: validProperties[0].longitude,
-        //   });
-        // }
+        if (validProperties.length > 0) {
+          setCenter({
+            lat: validProperties[0].latitude,
+            lng: validProperties[0].longitude,
+          });
+        }
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const calculateBounds = (map, properties) => {
+    if (!properties.length) return;
     const bounds = new window.google.maps.LatLngBounds();
     properties.forEach((property) => {
       bounds.extend({ lat: property.latitude, lng: property.longitude });
@@ -54,11 +54,18 @@ function GoolgeMap() {
     map.fitBounds(bounds); // Adjust zoom and pan to fit bounds
   };
 
+  function tooltip(property) {
+    const title = `${property.total_land_size_in_acres.acres} acres ${property.total_land_size_in_acres.guntas} guntas - ${property.price_per_acre_crore.crore} crore ${property.price_per_acre_crore.lakh} lakhs`;
+
+    return title;
+  }
+
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
+        key={"jbg"}
         zoom={10} // Set initial zoom level
         onLoad={(map) => calculateBounds(map, properties)}
         options={{
@@ -69,12 +76,15 @@ function GoolgeMap() {
         }}
       >
         {properties?.map((property) => (
-          <Marker
-            key={property.id}
-            position={{ lat: property.latitude, lng: property.longitude }}
-            icon={customIcon}
-            onClick={() => setSelectedProperty(property)}
-          />
+          <div key={property.id}>
+            <Marker
+              key={property.id}
+              position={{ lat: property.latitude, lng: property.longitude }}
+              icon={customIcon}
+              onClick={() => setSelectedProperty(property)}
+              title={`${property.total_land_size_in_acres.acres} acres ${property.total_land_size_in_acres.guntas} guntas - ${property.price_per_acre_crore.crore} crore ${property.price_per_acre_crore.lakh} lakhs`}
+            />
+          </div>
         ))}
 
         {selectedProperty && (
@@ -85,7 +95,9 @@ function GoolgeMap() {
             }}
             onCloseClick={() => setSelectedProperty(null)}
           >
-            <Details selectedProperty={selectedProperty} />
+            <div key={selectedProperty.id}>
+              <Details selectedProperty={selectedProperty} />
+            </div>
           </InfoWindow>
         )}
       </GoogleMap>
