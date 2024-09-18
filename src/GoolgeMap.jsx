@@ -54,12 +54,6 @@ function GoolgeMap() {
     map.fitBounds(bounds); // Adjust zoom and pan to fit bounds
   };
 
-  function tooltip(property) {
-    const title = `${property.total_land_size_in_acres.acres} acres ${property.total_land_size_in_acres.guntas} guntas - ${property.price_per_acre_crore.crore} crore ${property.price_per_acre_crore.lakh} lakhs`;
-
-    return title;
-  }
-
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <GoogleMap
